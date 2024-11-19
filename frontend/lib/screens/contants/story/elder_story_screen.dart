@@ -2,9 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:my_project/data/community_dummy_data.dart';
 import 'package:my_project/models/story.dart';
-import 'package:my_project/screens/common/widgets/story_tile.dart';
+import 'package:my_project/screens/contants/story/widgets/story_tile.dart';
 import 'package:my_project/screens/contants/story/elder_story_detail_screen.dart';
 
 class ElderStoryScreen extends StatefulWidget {
@@ -41,6 +40,7 @@ class _ElderStoryScreenState extends State<ElderStoryScreen> {
 
     setState(() {
       stories = datalist;
+      originalStories = datalist;
     });
   }
 
@@ -48,7 +48,7 @@ class _ElderStoryScreenState extends State<ElderStoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("동화책"),
+        title: const Text("이야기"),
         actions: [
           IconButton(
             onPressed: () {},
@@ -88,20 +88,23 @@ class _ElderStoryScreenState extends State<ElderStoryScreen> {
                 const SizedBox(width: 20),
                 MenuButton(
                   header_meau_style: _header_meau_style,
-                  title: "# 인기순 동화",
+                  title: "# 추천순 동화",
                   onPressed: () {
-                    //조회수 정렬
+                    //인기순 정렬
                     setState(() {
-                      stories.sort((a, b) => b.views.compareTo(a.views));
+                      stories.sort((a, b) =>
+                          b.recommendations.compareTo(a.recommendations));
                     });
                   },
                 ),
                 const SizedBox(width: 20),
                 MenuButton(
                   header_meau_style: _header_meau_style,
-                  title: "# 급상승 동화",
+                  title: "# 조회순 동화",
                   onPressed: () {
-                    stories.sort((a, b) => b.views.compareTo(a.views));
+                    setState(() {
+                      stories.sort((a, b) => b.views.compareTo(a.views));
+                    });
                   },
                 ),
                 const SizedBox(width: 40),
@@ -149,7 +152,7 @@ class MenuButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        minimumSize: const Size(200, 40),
+        minimumSize: const Size(180, 40),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(15)),
         ),

@@ -41,7 +41,7 @@ class ElderStorybookDetailScreen extends StatelessWidget {
             const SizedBox(height: 20),
 
             //이야기 작성란
-            Text(story.story),
+            // Text(story.story),
 
             //추천
             Center(
@@ -53,7 +53,7 @@ class ElderStorybookDetailScreen extends StatelessWidget {
                     onPressed: () {},
                     icon: const Icon(Icons.thumb_up),
                   ),
-                  Text("추천수 : ${story.numberOfView}"),
+                  Text("추천수 : ${story.views}"),
                 ],
               ),
             )

@@ -9,10 +9,7 @@ Widget buildStoryTile(
     ),
     title: Text("${order + 1}  ${story.title}"),
     trailing: Column(
-      children: [
-        Text('조회수: ${story.numberOfView}'),
-        Text('작성자: ${story.author}')
-      ],
+      children: [Text('조회수: ${story.views}'), Text('작성자: ${story.author}')],
     ),
     onTap: () {
       //상세 이야기 화면

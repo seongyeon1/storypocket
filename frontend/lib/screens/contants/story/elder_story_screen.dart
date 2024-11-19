@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:my_project/data/community_dummy_data.dart';
 import 'package:my_project/models/story.dart';
 import 'package:my_project/screens/common/widgets/story_tile.dart';
@@ -22,18 +25,23 @@ class _ElderStoryScreenState extends State<ElderStoryScreen> {
   @override
   void initState() {
     // TODO: implement initState
+    super.initState();
 
     // 데이터 가져오기
-    super.initState();
-    stories = storyData
-        .map((data) => Story(
-              title: data['title'] as String,
-              author: data['author'] as String,
-              story: data['story'] as String,
-              numberOfView: data['numberOfView'] as int,
-            ))
-        .toList();
-    originalStories = List.from(stories);
+    loadStories();
+  }
+
+  Future<void> loadStories() async {
+    String jsonString =
+        await rootBundle.loadString('assets/data/dummy_data.json');
+    List<dynamic> jsonData = jsonDecode(jsonString);
+
+    List<Story> datalist =
+        jsonData.map((data) => Story.fromJson(data)).toList();
+
+    setState(() {
+      stories = datalist;
+    });
   }
 
   @override
@@ -84,8 +92,7 @@ class _ElderStoryScreenState extends State<ElderStoryScreen> {
                   onPressed: () {
                     //조회수 정렬
                     setState(() {
-                      stories.sort(
-                          (a, b) => b.numberOfView.compareTo(a.numberOfView));
+                      stories.sort((a, b) => b.views.compareTo(a.views));
                     });
                   },
                 ),
@@ -94,8 +101,7 @@ class _ElderStoryScreenState extends State<ElderStoryScreen> {
                   header_meau_style: _header_meau_style,
                   title: "# 급상승 동화",
                   onPressed: () {
-                    stories.sort(
-                        (a, b) => b.numberOfView.compareTo(a.numberOfView));
+                    stories.sort((a, b) => b.views.compareTo(a.views));
                   },
                 ),
                 const SizedBox(width: 40),
@@ -105,9 +111,10 @@ class _ElderStoryScreenState extends State<ElderStoryScreen> {
 
           const SizedBox(height: 10),
           //게시글//
+
           Expanded(
             child: ListView.separated(
-              itemCount: storyData.length,
+              itemCount: stories.length,
               itemBuilder: (context, index) {
                 final story = stories[index];
                 final order = index;

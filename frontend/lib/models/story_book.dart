@@ -1,5 +1,5 @@
 // 스토리 객체 정의
-class Story {
+class StoryBook {
   String title;
   String author;
   String storyText;
@@ -8,7 +8,7 @@ class Story {
   int views;
   int recommendations;
 
-  Story({
+  StoryBook({
     required this.title,
     required this.author,
     required this.storyText,
@@ -18,8 +18,8 @@ class Story {
     required this.recommendations,
   });
 
-  factory Story.fromJson(Map<String, dynamic> json) {
-    return Story(
+  factory StoryBook.fromJson(Map<String, dynamic> json) {
+    return StoryBook(
       title: json['title'],
       author: json['author'],
       storyText: json['story_text'],

@@ -26,15 +26,15 @@ class _ElderStoybookScreenState extends State<ElderStoybookScreen> {
 
     // 데이터 가져오기
     super.initState();
-    stories = storyData
-        .map((data) => Story(
-              title: data['title'] as String,
-              author: data['author'] as String,
-              story: data['story'] as String,
-              numberOfView: data['numberOfView'] as int,
-            ))
-        .toList();
-    originalStories = List.from(stories);
+    // stories = storyData
+    //     .map((data) => Story(
+    //           title: data['title'] as String,
+    //           author: data['author'] as String,
+    //           story: data['story'] as String,
+    //           views: data['views'] as int,
+    //         ))
+    //     .toList();
+    // originalStories = List.from(stories);
   }
 
   @override
@@ -85,8 +85,7 @@ class _ElderStoybookScreenState extends State<ElderStoybookScreen> {
                   onPressed: () {
                     //조회수 정렬
                     setState(() {
-                      stories.sort(
-                          (a, b) => b.numberOfView.compareTo(a.numberOfView));
+                      stories.sort((a, b) => b.views.compareTo(a.views));
                     });
                   },
                 ),
@@ -95,8 +94,7 @@ class _ElderStoybookScreenState extends State<ElderStoybookScreen> {
                   header_meau_style: _header_meau_style,
                   title: "# 급상승 동화",
                   onPressed: () {
-                    stories.sort(
-                        (a, b) => b.numberOfView.compareTo(a.numberOfView));
+                    stories.sort((a, b) => b.views.compareTo(a.views));
                   },
                 ),
                 const SizedBox(width: 40),

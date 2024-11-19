@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+python-dotenv
+pydantic
+langchain-google-genai
+langchain_openai
+langchain_core
+langchain_community
+
+# pymysql
+pymongo
+sqlalchemy
+
+databases
+
+stability-sdk

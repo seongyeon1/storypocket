@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:my_project/screens/elder/profile/elder_profile_screen.dart';
-import 'home/elder_home_screen.dart';
+import 'package:my_project/screens/contants/point/elder_point_screen.dart';
+import 'package:my_project/screens/contants/profile/elder_profile_sceen.dart';
+import 'elder_home_screen.dart';
 import 'talk/talk_screen.dart';
 
 class ElderMainScreen extends StatefulWidget {
@@ -44,7 +45,7 @@ class _ElderMainScreenState extends State<ElderMainScreen> {
         index: _selectedIndex,
         children: const [
           ElderHomeScreen(), // 홈 화면
-          ElderProfileScreen(),
+          ElderProfileSceen(),
         ],
       ),
 

@@ -154,5 +154,5 @@ final storyData = [
     "author": "강민정 할머니",
     "story": "눈이 펑펑 내리면 친구들과 눈싸움을 했단다. 눈덩이를 뭉쳐서...",
     "numberOfView": 1415
-  },
+  }
 ];

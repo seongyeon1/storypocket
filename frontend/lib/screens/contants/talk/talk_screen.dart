@@ -39,16 +39,14 @@ class _TalkScreenState extends State<TalkScreen> {
   // TTS 초기화 및 언어 설정
   void _initializeTTS() async {
     await _tts.setLanguage("ko-KR");
-    // await _tts.setSpeechRate(1.2);
-    // await _tts.setPitch(1.2); // 피치를 높게 설정
-    await _tts.setVolume(0.9); // 볼륨 설정 (필요시)
     _tts.setCompletionHandler(() => setState(() => _isSpeaking = false));
   }
 
   // 세션 ID 생성 (사용자 고유 세션)
   void _generateSessionId() {
     final random = Random();
-    _sessionId = List.generate(10, (index) => random.nextInt(10).toString()).join();
+    _sessionId =
+        List.generate(10, (index) => random.nextInt(10).toString()).join();
   }
 
   Future<void> _listenAndRespond() async {
@@ -133,74 +131,32 @@ class _TalkScreenState extends State<TalkScreen> {
   Widget _buildSuggestedQuestions() {
     List<String> randomSuggestions = _getRandomSuggestions();
 
-    return Container(
+    return SizedBox(
       height: 50,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: randomSuggestions.length,
         itemBuilder: (context, index) {
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
             child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                elevation: 1,
+              ),
               onPressed: () {
                 setState(() {
                   _responseText = randomSuggestions[index];
                   _showSuggestions = false; // 추천 질문 클릭 시 추천 질문 숨기기
                 });
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.lightGreen,
-              ),
               child: Text(
                 randomSuggestions[index],
-                style: TextStyle(fontSize: 16, color: Colors.white),
+                style: const TextStyle(fontSize: 16),
               ),
             ),
           );
         },
       ),
-    );
-  }
-
-  Widget _buildSpeechBalloon(String text) {
-    final textPainter = TextPainter(
-      text: TextSpan(text: text, style: speechBalloonText),
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout(maxWidth: 250);
-
-    final textWidth = textPainter.size.width;
-    final textHeight = textPainter.size.height;
-
-    // 고정 크기로 말풍선 크기를 제한
-    final balloonWidth = textWidth + 60;
-    final balloonHeight = textHeight + 40;
-
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Container(
-          width: balloonWidth,
-          height: balloonHeight,
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/image/square-speech-bubble.png'),
-              fit: BoxFit.fill,
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: SizedBox(
-            width: 250,
-            child: Text(
-              text,
-              textAlign: TextAlign.center,
-              style: speechBalloonText,
-            ),
-          ),
-        ),
-      ],
     );
   }
 
@@ -269,7 +225,26 @@ class _TalkScreenState extends State<TalkScreen> {
           const SizedBox(height: 20),
 
           // AI 응답 말풍선
-          _buildSpeechBalloon(_responseText),
+          Stack(
+            children: [
+              Image.asset(
+                'assets/image/speech_balloon.png',
+                height: 200,
+              ),
+              Positioned(
+                top: 50,
+                left: 8,
+                child: SizedBox(
+                  width: 200,
+                  child: Text(
+                    _responseText, // AI 응답 텍스트
+                    textAlign: TextAlign.left,
+                    style: speechBalloonText,
+                  ),
+                ),
+              )
+            ],
+          ),
 
           // 소녀 이미지
           Image.asset(
@@ -304,23 +279,25 @@ class _TalkScreenState extends State<TalkScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 10),
 
           // 추천 질문 초기 표시
           if (_showSuggestions) _buildSuggestedQuestions(),
 
-          // 이야기 생성하기 버튼
+          const SizedBox(height: 10),
+
+          // 뒤로가기 버튼
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               fixedSize: const Size.fromWidth(199),
               elevation: 1,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(20),
               ),
             ),
             onPressed: _popTalkScreen,
             child: const Text(
-              "이야기 생성하기",
+              "뒤로가기",
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,

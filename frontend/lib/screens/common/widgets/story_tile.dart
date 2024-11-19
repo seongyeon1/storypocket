@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../models/story.dart';
-import '../../elder/storybook/elder_storybook_detail_screen.dart';
+import 'package:my_project/models/story.dart';
 
 Widget buildStoryTile(
     Story story, int order, BuildContext context, Widget storyScreen) {
@@ -11,7 +10,7 @@ Widget buildStoryTile(
     title: Text("${order + 1}  ${story.title}"),
     trailing: Column(
       children: [
-        Text('조회수: ${story.views}'),
+        Text('조회수: ${story.numberOfView}'),
         Text('작성자: ${story.author}')
       ],
     ),

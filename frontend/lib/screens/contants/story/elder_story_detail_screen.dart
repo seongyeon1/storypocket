@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:my_project/models/story.dart';
 
-class ElderStoryDetailScreen extends StatelessWidget {
+class ElderStoryDetailScreen extends StatefulWidget {
   final Story story;
   const ElderStoryDetailScreen({super.key, required this.story});
+
+  State<ElderStoryDetailScreen> createState() => _ElderStoryDetailScreenState();
+}
+  @override
+  class _ElderStoryDetailScreenState extends State<ElderStoryDetailScreen> {
+    final TextEditingController _commentController = TextEditingController();
+    final List<String> _comments = []; // 댓글 목록을 저장할 리스트
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(story.title),
+        title: Text(widget.story.title),
         actions: [
           IconButton(
             onPressed: () {},

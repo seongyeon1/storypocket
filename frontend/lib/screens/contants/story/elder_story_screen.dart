@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:my_project/models/story.dart';
+import 'package:my_project/screens/common/widgets/story_meau_tile.dart';
 import 'package:my_project/screens/contants/story/widgets/story_tile.dart';
 import 'package:my_project/screens/contants/story/elder_story_detail_screen.dart';
 
@@ -19,7 +20,7 @@ class _ElderStoryScreenState extends State<ElderStoryScreen> {
 
   //버튼 텍스트 스타일
   final _header_meau_style =
-      const TextStyle(fontSize: 20, fontWeight: FontWeight.w500);
+      const TextStyle(fontSize: 27, fontWeight: FontWeight.w600);
 
   @override
   void initState() {
@@ -69,47 +70,41 @@ class _ElderStoryScreenState extends State<ElderStoryScreen> {
         children: [
           const SizedBox(height: 5),
           //메뉴//
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal, // 가로 스크롤 설정
-            child: Row(
-              children: [
-                const SizedBox(width: 10),
-                MenuButton(
-                  header_meau_style: _header_meau_style,
-                  title: "# 최신순 동화",
-                  onPressed: () {
-                    //최신순 정렬
-                    setState(() {
-                      // 원본 데이터로 다시 정렬
-                      stories = List.from(originalStories);
-                    });
-                  },
-                ),
-                const SizedBox(width: 20),
-                MenuButton(
-                  header_meau_style: _header_meau_style,
-                  title: "# 추천순 동화",
-                  onPressed: () {
-                    //인기순 정렬
-                    setState(() {
-                      stories.sort((a, b) =>
-                          b.recommendations.compareTo(a.recommendations));
-                    });
-                  },
-                ),
-                const SizedBox(width: 20),
-                MenuButton(
-                  header_meau_style: _header_meau_style,
-                  title: "# 조회순 동화",
-                  onPressed: () {
-                    setState(() {
-                      stories.sort((a, b) => b.views.compareTo(a.views));
-                    });
-                  },
-                ),
-                const SizedBox(width: 40),
-              ],
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              MeauBottonTile(
+                headerMeauStyle: _header_meau_style,
+                title: "최신순",
+                onPressed: () {
+                  //최신순 정렬
+                  setState(() {
+                    // 원본 데이터로 다시 정렬
+                    stories = List.from(originalStories);
+                  });
+                },
+              ),
+              MeauBottonTile(
+                headerMeauStyle: _header_meau_style,
+                title: "추천순",
+                onPressed: () {
+                  //인기순 정렬
+                  setState(() {
+                    stories.sort((a, b) =>
+                        b.recommendations.compareTo(a.recommendations));
+                  });
+                },
+              ),
+              MeauBottonTile(
+                headerMeauStyle: _header_meau_style,
+                title: "조회순",
+                onPressed: () {
+                  setState(() {
+                    stories.sort((a, b) => b.views.compareTo(a.views));
+                  });
+                },
+              ),
+            ],
           ),
 
           const SizedBox(height: 10),
@@ -131,36 +126,6 @@ class _ElderStoryScreenState extends State<ElderStoryScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class MenuButton extends StatelessWidget {
-  const MenuButton({
-    super.key,
-    required this.onPressed,
-    required TextStyle header_meau_style,
-    required this.title,
-  }) : _header_meau_style = header_meau_style;
-
-  final TextStyle _header_meau_style;
-  final String title;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        minimumSize: const Size(180, 40),
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(15)),
-        ),
-      ),
-      onPressed: onPressed,
-      child: Text(
-        title,
-        style: _header_meau_style,
       ),
     );
   }

@@ -11,7 +11,10 @@ class ElderStoryDetailScreen extends StatefulWidget {
 
 class _ElderStoryDetailScreenState extends State<ElderStoryDetailScreen> {
   final TextEditingController _commentController = TextEditingController();
-  final List<String> _comments = []; // 댓글 목록을 저장할 리스트
+  final List<String> _comments = [
+    "재미있게 잘 보았어요!",
+    "너무 감동적입니다."
+  ]; // 댓글 목록을 저장할 리스트
 
   @override
   Widget build(BuildContext context) {
@@ -60,24 +63,34 @@ class _ElderStoryDetailScreenState extends State<ElderStoryDetailScreen> {
                     ),
                     const SizedBox(height: 20),
                     //이야기 작성란
-                    Text(widget.story.storyText),
+                    Text(
+                      widget.story.storyText,
+                      style: const TextStyle(
+                        fontSize: 30,
+                      ),
+                    ),
                     //추천
                     Center(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           IconButton(
-                            iconSize: 50,
+                            iconSize: 60,
                             onPressed: () {},
                             icon: const Icon(Icons.thumb_up),
                           ),
-                          Text("추천수 : ${widget.story.recommendations}"),
+                          Text(
+                            "추천수 : ${widget.story.recommendations}",
+                            style: const TextStyle(
+                              fontSize: 20,
+                            ),
+                          ),
                         ],
                       ),
                     ),
 
                     // 댓글 목록
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
                     const Text(
                       "댓글",
                       style: TextStyle(

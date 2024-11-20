@@ -15,6 +15,24 @@ class ElderStorybookInstructionScreen extends StatefulWidget {
 
 class _ElderStorybookInstructionScreenState
     extends State<ElderStorybookInstructionScreen> {
+  void toAudioBook() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ElderStorybookMp3Screen(
+                  storyBook: widget.storyBook,
+                )));
+  }
+
+  void toStoryBook() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ElderStorybookCutScreen(
+                  storyBook: widget.storyBook,
+                )));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,6 +51,7 @@ class _ElderStorybookInstructionScreenState
                 "assets/image/storyimage/${widget.storyBook.sessionId}-1.png",
                 width: 370,
               ),
+              const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -43,6 +62,9 @@ class _ElderStorybookInstructionScreenState
                 ],
               ),
               /* 글쓴이 */
+              const SizedBox(
+                height: 20,
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -67,43 +89,9 @@ class _ElderStorybookInstructionScreenState
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ElderStorybookCutScreen(
-                                storyBook: widget.storyBook,
-                              )));
-                },
-                style: ButtonStyle(
-                  fixedSize: WidgetStateProperty.all(
-                      const Size(175, 50)), // 가로 200, 세로 50
-                ),
-                child: Text(
-                  '동화 보러가기',
-                  style: buttonFontStyle(),
-                ),
-              ),
+              readButton(context, '동화 읽기', toStoryBook),
               //오디오북 듣기
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ElderStorybookMp3Screen(
-                                storyBook: widget.storyBook,
-                              )));
-                },
-                style: ButtonStyle(
-                  fixedSize: WidgetStateProperty.all(
-                      const Size(175, 50)), // 가로 200, 세로 50
-                ),
-                child: Text(
-                  '오디오 북 듣기',
-                  style: buttonFontStyle(),
-                ),
-              ),
+              readButton(context, '오디오 북', toAudioBook)
             ],
           )
         ],
@@ -111,15 +99,31 @@ class _ElderStorybookInstructionScreenState
     );
   }
 
+  ElevatedButton readButton(
+      BuildContext context, String text, VoidCallback navi) {
+    return ElevatedButton(
+      onPressed: navi,
+      style: ButtonStyle(
+        fixedSize: WidgetStateProperty.all(
+          const Size(180, 50),
+        ), // 가로 200, 세로 50
+      ),
+      child: Text(
+        text,
+        style: buttonFontStyle(),
+      ),
+    );
+  }
+
   TextStyle titleFontStyle() {
-    return const TextStyle(fontSize: 20, fontWeight: FontWeight.w600);
+    return const TextStyle(fontSize: 28, fontWeight: FontWeight.w600);
   }
 
   TextStyle nameFontStyle() {
-    return const TextStyle(fontSize: 17, fontWeight: FontWeight.w600);
+    return const TextStyle(fontSize: 20, fontWeight: FontWeight.w600);
   }
 
   TextStyle buttonFontStyle() {
-    return const TextStyle(fontSize: 16, fontWeight: FontWeight.w600);
+    return const TextStyle(fontSize: 23, fontWeight: FontWeight.w600);
   }
 }

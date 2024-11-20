@@ -15,7 +15,8 @@ class TalkScreen extends StatefulWidget {
 
 class _TalkScreenState extends State<TalkScreen> {
   final TextStyle speechBalloonText =
-      const TextStyle(fontSize: 17, fontWeight: FontWeight.w600);
+      const TextStyle(fontSize: 20, fontWeight: FontWeight.w500);
+
   final FlutterTts _tts = FlutterTts();
   late stt.SpeechToText _speech;
   bool _isListening = false;
@@ -140,9 +141,6 @@ class _TalkScreenState extends State<TalkScreen> {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
             child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                elevation: 1,
-              ),
               onPressed: () {
                 setState(() {
                   _responseText = randomSuggestions[index];
@@ -151,7 +149,10 @@ class _TalkScreenState extends State<TalkScreen> {
               },
               child: Text(
                 randomSuggestions[index],
-                style: const TextStyle(fontSize: 16),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           );
@@ -200,42 +201,28 @@ class _TalkScreenState extends State<TalkScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.monetization_on_rounded),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.notifications),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.account_circle_rounded),
-          )
-        ],
+        title: const Text("AI 손녀"),
       ),
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Container(
-            alignment: const Alignment(0, 0),
-            child: const Text("마이크 버튼을 클릭하고 대화를 시작해 보세요!"),
+          const Text(
+            "마이크 버튼을 클릭하고 대화를 시작해 보세요!",
+            style: TextStyle(fontSize: 17),
           ),
-          const SizedBox(height: 20),
 
           // AI 응답 말풍선
           Stack(
             children: [
               Image.asset(
                 'assets/image/speech_balloon.png',
-                height: 200,
+                height: 250,
               ),
               Positioned(
                 top: 50,
-                left: 8,
+                left: 15,
                 child: SizedBox(
-                  width: 200,
+                  width: 240,
                   child: Text(
                     _responseText, // AI 응답 텍스트
                     textAlign: TextAlign.left,
@@ -258,39 +245,20 @@ class _TalkScreenState extends State<TalkScreen> {
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 "사용자: $_recognizedText", // 사용자 실시간 텍스트
-                textAlign: TextAlign.center,
                 style: speechBalloonText,
               ),
             ),
 
           // 마이크 버튼
-          Container(
-            decoration: const ShapeDecoration(
-              shape: CircleBorder(
-                side: BorderSide(color: Colors.black, width: 2),
-              ),
-            ),
-            child: IconButton(
-              onPressed: _listenAndRespond,
-              icon: Icon(
-                _isListening ? Icons.mic : Icons.mic_none,
-                size: 45,
-                color: _isListening ? Colors.red : Colors.blueAccent,
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
+          mice_button(),
 
           // 추천 질문 초기 표시
           if (_showSuggestions) _buildSuggestedQuestions(),
-
-          const SizedBox(height: 10),
 
           // 뒤로가기 버튼
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               fixedSize: const Size.fromWidth(199),
-              elevation: 1,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -299,12 +267,30 @@ class _TalkScreenState extends State<TalkScreen> {
             child: const Text(
               "뒤로가기",
               style: TextStyle(
-                fontSize: 20,
+                fontSize: 25,
                 fontWeight: FontWeight.w700,
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Container mice_button() {
+    return Container(
+      decoration: const ShapeDecoration(
+        shape: CircleBorder(
+          side: BorderSide(color: Colors.black, width: 2),
+        ),
+      ),
+      child: IconButton(
+        onPressed: _listenAndRespond,
+        icon: Icon(
+          _isListening ? Icons.mic : Icons.mic_none,
+          size: 60,
+          color: _isListening ? Colors.red : Colors.blueAccent,
+        ),
       ),
     );
   }

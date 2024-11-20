@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:my_project/screens/common/widgets/search_bar.dart';
+import 'package:my_project/young/young_storybook_screen.dart';
 
 class YoungHomeScreen extends StatefulWidget {
   const YoungHomeScreen({super.key});
@@ -39,7 +39,7 @@ class _YoungHomeScreenState extends State<YoungHomeScreen> {
         index: _selectedIndex,
         children: [
           Page1(),
-          
+          const YoungStorybookScreen(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(

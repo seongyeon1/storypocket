@@ -24,7 +24,7 @@ class StorybookCut extends StatelessWidget {
               height: 30,
             ),
             Text(
-              storyBook.cuts[num].description,
+              storyBook.cuts[num].text,
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
             )
           ],

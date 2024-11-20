@@ -25,6 +25,7 @@ class _TalkScreenState extends State<TalkScreen> {
   String _recognizedText = ''; // 실시간 사용자 말풍선 텍스트
   String _responseText = '안녕하세요! 오늘은 어떤 이야기를 할까요?'; // 초기 AI 응답 텍스트
   String _sessionId = 'session_id1'; // 세션 ID
+  String _userId = 'user_id1'; // 사용자 ID
   String sex = '할아버지'; // 성별 정보 (예: 할아버지, 할머니)
   Timer? _stopListeningTimer;
   final int _noInputTimeout = 5;
@@ -112,6 +113,47 @@ class _TalkScreenState extends State<TalkScreen> {
     } catch (e) {
       setState(() {
         _responseText = "서버 연결에 실패했습니다.";
+      });
+    }
+  }
+
+  Future<void> _generateStory() async {
+    final url = Uri.parse('http://127.0.0.1:8000/generate-story/'); // 이야기 생성 API
+    final headers = {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+    };
+
+    final body = json.encode({
+      "session_id": _sessionId,
+      "user_id": _userId,
+    });
+
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(utf8.decode(response.bodyBytes));
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text("이야기 생성 완료!"),
+            content: Text("제목: ${responseBody['title']}\n\n${responseBody['story_text']}"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text("확인"),
+              ),
+            ],
+          ),
+        );
+      } else {
+        setState(() {
+          _responseText = "Error: ${response.statusCode}";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _responseText = "이야기 생성 중 오류가 발생했습니다.";
       });
     }
   }
@@ -261,7 +303,7 @@ class _TalkScreenState extends State<TalkScreen> {
           // 추천 질문 초기 표시
           if (_showSuggestions) _buildSuggestedQuestions(),
 
-          // 뒤로가기 버튼
+          // 이야기 생성 버튼
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               fixedSize: const Size.fromWidth(199),
@@ -269,9 +311,9 @@ class _TalkScreenState extends State<TalkScreen> {
                 borderRadius: BorderRadius.circular(20),
               ),
             ),
-            onPressed: _popTalkScreen,
+            onPressed: _generateStory,
             child: const Text(
-              "뒤로가기",
+              "이야기 생성",
               style: TextStyle(
                 fontSize: 25,
                 fontWeight: FontWeight.w700,

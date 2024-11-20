@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_project/screens/auth/id_pw_screen.dart';
+import 'package:my_project/young/young_home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -77,7 +78,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   "assets/image/login/kakao_login.png",
                   width: 200,
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const YoungHomeScreen(),
+                    ),
+                    (Route<dynamic> route) => false,
+                  );
+                },
               ),
             ),
 

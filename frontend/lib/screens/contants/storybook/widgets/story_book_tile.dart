@@ -10,7 +10,11 @@ Widget storyBookTile(
     ),
     title: Text("${order + 1}  ${story.title}", style: StoryMenuFontsize()),
     trailing: Column(
-      children: [Text('조회수: ${story.views}'), Text('작성자: ${story.author}')],
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text('조회수: ${story.views}'),
+        Text('작성자: ${story.author}'),
+      ],
     ),
     onTap: () {
       //상세 이야기 화면

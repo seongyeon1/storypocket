@@ -5,14 +5,6 @@ class ElderStoryDetailScreen extends StatefulWidget {
   final Story story;
   const ElderStoryDetailScreen({super.key, required this.story});
 
-  State<ElderStoryDetailScreen> createState() => _ElderStoryDetailScreenState();
-}
-  @override
-  class _ElderStoryDetailScreenState extends State<ElderStoryDetailScreen> {
-    final TextEditingController _commentController = TextEditingController();
-    final List<String> _comments = []; // 댓글 목록을 저장할 리스트
-
-
   @override
   State<ElderStoryDetailScreen> createState() => _ElderStoryDetailScreenState();
 }

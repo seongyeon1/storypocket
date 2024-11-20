@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:my_project/screens/contants/elder_main_screen.dart';
 
@@ -104,10 +103,11 @@ class _IdPwScreenState extends State<IdPwScreen> {
       children: [
         const Text("계정이 없으신가요? "),
         TextButton(
-            onPressed: () {},
-            child: const Text(
-              "계정 새로 만들기",
-            ))
+          onPressed: () {},
+          child: const Text(
+            "계정 새로 만들기",
+          ),
+        )
       ],
     );
   }

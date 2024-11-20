@@ -85,6 +85,24 @@ class _ElderPointScreenState extends State<ElderPointScreen> {
                   trailing: const Icon(Icons.arrow_forward_ios),
                   onTap: () {},
                 ),
+                ListTile(
+                  leading: const Icon(Icons.file_copy, size: 30),
+                  title: Text(
+                    '문의사항',
+                    style: menuFontsize(),
+                  ),
+                  trailing: const Icon(Icons.arrow_forward_ios),
+                  onTap: () {},
+                ),
+                ListTile(
+                  leading: const Icon(Icons.call, size: 30),
+                  title: Text(
+                    '고객 소리함',
+                    style: menuFontsize(),
+                  ),
+                  trailing: const Icon(Icons.arrow_forward_ios),
+                  onTap: () {},
+                ),
               ],
             ),
           ),

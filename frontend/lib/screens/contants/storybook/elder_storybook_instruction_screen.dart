@@ -20,20 +20,6 @@ class _ElderStorybookInstructionScreenState
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.storyBook.title),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.monetization_on_rounded),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.notifications),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.account_circle_rounded),
-          )
-        ],
       ),
       backgroundColor: const Color(0xFFFEF9F7),
       body: Column(

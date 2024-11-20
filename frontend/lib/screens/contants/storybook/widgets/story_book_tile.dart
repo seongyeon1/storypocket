@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_project/models/story_book.dart';
+import 'package:my_project/style/fontstyle.dart';
 
 Widget storyBookTile(
     StoryBook story, int order, BuildContext context, Widget storyScreen) {
@@ -7,7 +8,7 @@ Widget storyBookTile(
     leading: const CircleAvatar(
       backgroundImage: AssetImage("assets/image/grandma_grandpa.png"),
     ),
-    title: Text("${order + 1}  ${story.title}"),
+    title: Text("${order + 1}  ${story.title}", style: StoryMenuFontsize()),
     trailing: Column(
       children: [Text('조회수: ${story.views}'), Text('작성자: ${story.author}')],
     ),

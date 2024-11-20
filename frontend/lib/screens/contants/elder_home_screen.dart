@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_project/screens/contants/point/elder_point_screen.dart';
 import 'package:my_project/screens/contants/story/elder_story_screen.dart';
 import 'package:my_project/screens/contants/storybook/elder_storybook_screen.dart';
 import 'package:my_project/screens/contants/talk/talk_screen.dart';
@@ -32,7 +33,8 @@ class _ElderHomeScreenState extends State<ElderHomeScreen> {
   // 내 포인트 확인 화면으로 이동하는 함수
   void _showPointScreen() {
     // TODO: 내 포인트 확인 화면으로 이동하는 로직 구현
-    print('내 포인트 확인 화면으로 이동');
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => const ElderPointScreen()));
   }
 
   @override
@@ -56,11 +58,10 @@ class _ElderHomeScreenState extends State<ElderHomeScreen> {
             crossAxisSpacing: 16.0, // 가로 간격
             children: [
               _buildGridButton(_showTalkScreen, '이야기 하기', Icons.call),
-              _buildGridButton(_showStoryScreen, '이야기 구경하기', Icons.forum),
+              _buildGridButton(_showStoryScreen, '이야기 구경', Icons.forum),
+              _buildGridButton(_showStorybookScreen, '동화책 보기', Icons.menu_book),
               _buildGridButton(
-                  _showStorybookScreen, '동화책 보러가기', Icons.menu_book),
-              _buildGridButton(
-                  _showPointScreen, '내 포인트 확인', Icons.monetization_on),
+                  _showPointScreen, '포인트 확인', Icons.monetization_on),
             ],
           ),
         ],
@@ -73,6 +74,8 @@ Widget _buildGridButton(VoidCallback showScreen, String text, IconData icon) {
   return ElevatedButton(
     onPressed: showScreen,
     style: ElevatedButton.styleFrom(
+      shadowColor: Colors.black,
+      elevation: 4,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(30),
       ),
@@ -81,20 +84,20 @@ Widget _buildGridButton(VoidCallback showScreen, String text, IconData icon) {
       alignment: Alignment.center,
       children: <Widget>[
         Positioned(
-          bottom: 50,
+          bottom: 40,
           child: Text(
             text,
             style: const TextStyle(
-              fontSize: 20,
+              fontSize: 30,
               fontWeight: FontWeight.w800,
             ),
           ),
         ),
         Positioned(
-          top: 50,
+          top: 40,
           child: Icon(
             icon,
-            size: 30,
+            size: 40,
           ),
         ),
       ],

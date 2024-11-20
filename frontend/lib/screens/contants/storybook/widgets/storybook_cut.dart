@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:my_project/models/cuts.dart';
 import 'package:my_project/models/story_book.dart';
 
 class StorybookCut extends StatelessWidget {

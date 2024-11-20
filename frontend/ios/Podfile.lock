@@ -1,7 +1,14 @@
 PODS:
+  - audio_session (0.0.1):
+    - Flutter
   - Flutter (1.0.0)
   - flutter_tts (0.0.1):
     - Flutter
+  - just_audio (0.0.1):
+    - Flutter
+  - path_provider_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
   - speech_to_text (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -9,8 +16,11 @@ PODS:
   - Try (2.1.1)
 
 DEPENDENCIES:
+  - audio_session (from `.symlinks/plugins/audio_session/ios`)
   - Flutter (from `Flutter`)
   - flutter_tts (from `.symlinks/plugins/flutter_tts/ios`)
+  - just_audio (from `.symlinks/plugins/just_audio/ios`)
+  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - speech_to_text (from `.symlinks/plugins/speech_to_text/darwin`)
 
 SPEC REPOS:
@@ -18,16 +28,25 @@ SPEC REPOS:
     - Try
 
 EXTERNAL SOURCES:
+  audio_session:
+    :path: ".symlinks/plugins/audio_session/ios"
   Flutter:
     :path: Flutter
   flutter_tts:
     :path: ".symlinks/plugins/flutter_tts/ios"
+  just_audio:
+    :path: ".symlinks/plugins/just_audio/ios"
+  path_provider_foundation:
+    :path: ".symlinks/plugins/path_provider_foundation/darwin"
   speech_to_text:
     :path: ".symlinks/plugins/speech_to_text/darwin"
 
 SPEC CHECKSUMS:
+  audio_session: 088d2483ebd1dc43f51d253d4a1c517d9a2e7207
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_tts: 0f492aab6accf87059b72354fcb4ba934304771d
+  just_audio: baa7252489dbcf47a4c7cc9ca663e9661c99aafa
+  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   speech_to_text: 627d3fd2194770b51abb324ba45c2d39398f24a8
   Try: 5ef669ae832617b3cee58cb2c6f99fb767a4ff96
 

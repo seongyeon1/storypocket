@@ -1,11 +1,8 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:my_project/models/cuts.dart';
 
 import 'package:my_project/models/story_book.dart';
 import 'package:my_project/screens/contants/storybook/elder_storybook_cut_screen.dart';
+import 'package:my_project/screens/contants/storybook/elder_storybook_mp3_screen.dart';
 
 class ElderStorybookInstructionScreen extends StatefulWidget {
   final StoryBook storyBook;
@@ -18,8 +15,6 @@ class ElderStorybookInstructionScreen extends StatefulWidget {
 
 class _ElderStorybookInstructionScreenState
     extends State<ElderStorybookInstructionScreen> {
- 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,7 +45,7 @@ class _ElderStorybookInstructionScreenState
             children: [
               Image.asset(
                 "assets/image/storyimage/${widget.storyBook.sessionId}-1.png",
-                width: 350,
+                width: 370,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -83,23 +78,47 @@ class _ElderStorybookInstructionScreenState
           ),
 
           /* 동화 보러가기 */
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ElderStorybookCutScreen(
-                            storyBook: widget.storyBook,
-                          )));
-            },
-            style: ButtonStyle(
-              fixedSize:
-                  WidgetStateProperty.all(const Size(200, 50)), // 가로 200, 세로 50
-            ),
-            child: Text(
-              '동화 보러가기!',
-              style: buttonFontStyle(),
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ElderStorybookCutScreen(
+                                storyBook: widget.storyBook,
+                              )));
+                },
+                style: ButtonStyle(
+                  fixedSize: WidgetStateProperty.all(
+                      const Size(175, 50)), // 가로 200, 세로 50
+                ),
+                child: Text(
+                  '동화 보러가기',
+                  style: buttonFontStyle(),
+                ),
+              ),
+              //오디오북 듣기
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ElderStorybookMp3Screen(
+                                storyBook: widget.storyBook,
+                              )));
+                },
+                style: ButtonStyle(
+                  fixedSize: WidgetStateProperty.all(
+                      const Size(175, 50)), // 가로 200, 세로 50
+                ),
+                child: Text(
+                  '오디오 북 듣기',
+                  style: buttonFontStyle(),
+                ),
+              ),
+            ],
           )
         ],
       ),

@@ -154,10 +154,6 @@ async def generate_story(session_id: str, user_id: str):
     if not user_data:
         raise HTTPException(status_code=404, detail="User not found")
 
-    # 이야기 제목 동적 생성
-    title_suffix = "할아버지의 옛날 이야기" if user_data["gender"] == "male" else "할머니의 옛날 이야기"
-    title = f"{user_data['name']} {title_suffix}"
-
     # 이야기 생성
     try:
         final_story = story_chain.invoke({"story": story_text})
@@ -168,8 +164,8 @@ async def generate_story(session_id: str, user_id: str):
     story_data = {
         "_id": session_id,
         "user_id": user_id,
-        "title": title,
-        "story_text": final_story,
+        "title": final_story['title'],
+        "story_text": final_story['text'],
         "recommendations": 0,
         "views": 0,
         "daily_topic": True,  # 구분: 오늘의 이야기로 설정
@@ -181,41 +177,29 @@ async def generate_story(session_id: str, user_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database insertion failed: {str(e)}")
 
-    return {"session_id": session_id, "story_text": final_story}
+    return {"session_id": session_id, "title": final_story['title'],
+        "story_text": final_story['text']}
 
-# @app.get("/api/stories", response_model=List[StoryResponse])
-# async def get_all_stories():
-#     try:
-#         # MongoDB에서 모든 이야기를 가져옴
-#         stories_cursor = stories_collection.find()
-#         stories = []
+@app.post("/tts/")
+async def generate_story_tts(session_id: str):
+    # 사용자 정보 가져오기
+    data = stories_collection.find_one({"_id": session_id})
+    if not data:
+        raise HTTPException(status_code=404, detail="Data not found")
 
-#         for story in stories_cursor:
-#             # MongoDB ObjectId를 문자열로 변환
-#             story_data = {
-#                 "session_id": str(story["_id"]),
-#                 "user_id": story["user_id"],
-#                 "title": story["title"],
-#                 "story_text": story["story_text"],
-#                 "recommendations": story["recommendations"],
-#                 "views": story["views"],
-#                 "daily_topic": story["daily_topic"],
-#                 "created_at": story["created_at"],
-#                 "cuts": [
-#                     {
-#                         "page": cut["page"],
-#                         "text": cut["text"],
-#                         "description": cut["description"],
-#                         "image_prompt": cut["image_prompt"]
-#                     }
-#                     for cut in story["cuts"]
-#                 ]
-#             }
-#             stories.append(story_data)
+    from openai import OpenAI
+    client = OpenAI()
 
-#         return stories
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=f"Failed to fetch stories: {str(e)}")
+    response = client.audio.speech.create(
+        model="tts-1",
+        voice="onyx",
+        input=data['story_text'],
+    )
+    file_path = f"./static/{session_id}/{data['title']}.mp3"
+
+    response.stream_to_file(file_path)
+
+    return {"session_id": session_id, "file_path": file_path}
 
 @app.get("/api/stories", response_model=List[StoryResponse])
 async def get_all_stories():
@@ -256,53 +240,116 @@ async def get_all_stories():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch stories: {str(e)}")
 
-
-import os
-from bson.objectid import ObjectId
-from io import BytesIO
-from PIL import Image
-
-# 이미지 저장 경로
-IMAGE_STORAGE_PATH = "../static/"
-
-@app.post("/generate-images/{session_id}")
-async def generate_images(session_id: str, user_id: str):
-    # MongoDB에서 이야기 가져오기
+## storycut만드는 함수 추가
+@app.post("/generate-storycuts/")
+async def generate_storycuts(session_id: str, user_id: str):
+    """
+    Generate storycuts for a story and save them to MongoDB.
+    """
+    # Fetch the story from MongoDB
     story = stories_collection.find_one({"_id": session_id, "user_id": user_id})
     if not story:
         raise HTTPException(status_code=404, detail="Story not found or unauthorized access")
 
-    # 이미지 프롬프트 생성 및 이미지 생성
+    # Generate storycuts using the provided `make_storycuts` function
     try:
-        descriptions = story_to_img_chain.invoke({"story": story["story_text"]}).split('\n\n')
-        session_path = os.path.join(IMAGE_STORAGE_PATH, session_id)
-        os.makedirs(session_path, exist_ok=True)  # 이미지 저장 경로 생성
+        storycuts_data = make_storycuts(story["story_text"])
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Storycuts generation failed: {str(e)}")
 
-        cuts = []  # 페이지별 데이터 저장
-        for idx, description in enumerate(descriptions):
-            prompt = description_to_prompt_chain.invoke({'description': description})
-            img = generate_image(story=prompt)  # PIL 이미지 객체
+    # Update the MongoDB document with the generated storycuts
+    try:
+        stories_collection.update_one(
+            {"_id": session_id},
+            {"$set": {"cuts": storycuts_data["storybook"]}}
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to save storycuts: {str(e)}")
 
-            # 이미지 저장
-            img_filename = f"{idx+1}.png"
+    return {"session_id": session_id, "cuts": storycuts_data["storybook"]}
+
+
+@app.post("/generate-images/{session_id}")
+async def generate_images_for_storycuts(session_id: str, user_id: str):
+    """
+    Generate images for storycuts and save paths to MongoDB.
+    """
+    # Fetch the story with cuts from MongoDB
+    story = stories_collection.find_one({"_id": session_id, "user_id": user_id})
+    if not story or "cuts" not in story:
+        raise HTTPException(status_code=404, detail="Story or storycuts not found")
+
+    # Prepare directory for storing images
+    session_path = f"./static/{session_id}"
+    os.makedirs(session_path, exist_ok=True)
+
+    # Generate images for each cut
+    updated_cuts = []
+    try:
+        for cut in story["cuts"]:
+            prompt = cut["image_prompt"]
+            img = generate_images(story=prompt)  # Generate image using the prompt
+
+            # Save image to the file system
+            img_filename = f"{cut['page']}.png"
             img_filepath = os.path.join(session_path, img_filename)
             img.save(img_filepath)
 
-            # StoryCut 데이터 생성
-            cuts.append({
-                "page": idx + 1,  # 페이지 정보 (1, 2, 3...)
-                "text": f"Page {idx + 1} content generated based on the story",
-                "description": description, #한글 장면묘사
-                "image_prompt": prompt, # 이미지 프롬프트
-            })
+            # Update cut data with image path
+            cut["image_path"] = img_filepath
+            updated_cuts.append(cut)
 
-        # MongoDB에 업데이트 (cuts 필드에 이미지 데이터 추가)
+        # Update the MongoDB document with image paths
         stories_collection.update_one(
             {"_id": session_id},
-            {"$set": {"cuts": cuts}}
+            {"$set": {"cuts": updated_cuts}}
         )
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Image generation failed: {str(e)}")
 
-    return {"session_id": session_id, "cuts": cuts}
+    return {"session_id": session_id, "cuts": updated_cuts}
+
+# import os
+# from bson.objectid import ObjectId
+# from io import BytesIO
+# from PIL import Image
+
+# # 이미지 저장 경로
+# IMAGE_STORAGE_PATH = "../static/"
+
+# @app.post("/generate-images/{session_id}")
+# async def generate_images(session_id: str, user_id: str):
+#     # MongoDB에서 이야기 가져오기
+#     # **위에 storycut 만든 것 가져와서 사용하는 것으로 수정**
+#     story = stories_collection.find_one({"_id": session_id, "user_id": user_id})
+#     if not story:
+#         raise HTTPException(status_code=404, detail="Story not found or unauthorized access")
+
+#     # 이미지 프롬프트 생성 및 이미지 생성
+#     try:
+#         descriptions = story_to_img_chain.invoke({"story": story["story_text"]}).split('\n\n')
+#         session_path = os.path.join(IMAGE_STORAGE_PATH, session_id)
+#         os.makedirs(session_path, exist_ok=True)  # 이미지 저장 경로 생성
+
+#         cuts = []  # 페이지별 데이터 저장
+#         for idx, description in enumerate(descriptions):
+#             prompt = description_to_prompt_chain.invoke({'description': description})
+#             img = generate_images(story=prompt)  # PIL 이미지 객체
+
+#             # 이미지 저장
+#             img_filename = f"{idx+1}.png"
+#             img_filepath = os.path.join(session_path, img_filename)
+#             img.save(img_filepath)
+
+
+#         # MongoDB에 업데이트 (cuts 필드에 이미지 데이터 추가)
+#         stories_collection.update_one(
+#             {"_id": session_id},
+#             {"$set": {"cuts": cuts}}
+#         )
+
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=f"Image generation failed: {str(e)}")
+
+#     return {"session_id": session_id, "cuts": cuts}

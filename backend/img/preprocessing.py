@@ -1,9 +1,18 @@
 #preprocessing.py
 from .prompts import *
-from common import *
+# from common import *
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from dotenv import load_dotenv
 
+load_dotenv()
+
+from langchain_openai import ChatOpenAI
+gpt_4o_mini = ChatOpenAI(
+    temperature=0, 
+    model_name="gpt-4o-mini",
+    streaming=True,
+)
 llm = gpt_4o_mini
 # llm = gemini_1_5_flash
 

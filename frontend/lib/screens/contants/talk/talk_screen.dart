@@ -25,7 +25,11 @@ class _TalkScreenState extends State<TalkScreen> {
   String _recognizedText = ''; // 실시간 사용자 말풍선 텍스트
   String _responseText = '안녕하세요! 오늘은 어떤 이야기를 할까요?'; // 초기 AI 응답 텍스트
   String _sessionId = 'session_id1'; // 세션 ID
+<<<<<<< Updated upstream
   String _userId = 'user123'; // 사용자 ID
+=======
+  final String _userId = 'user_id1'; // 사용자 ID
+>>>>>>> Stashed changes
   String sex = '할아버지'; // 성별 정보 (예: 할아버지, 할머니)
   Timer? _stopListeningTimer;
   final int _noInputTimeout = 15;
@@ -84,7 +88,7 @@ class _TalkScreenState extends State<TalkScreen> {
   }
 
   Future<void> _sendMessage(String message) async {
-    final url = Uri.parse('http://127.0.0.1:8000/chat/'); // 서버 URL
+    final url = Uri.parse('http://10.30.0.183:8000/chat/'); // 10.0.2.2 사용
     final headers = {
       "accept": "application/json",
       "Content-Type": "application/json",
@@ -102,7 +106,7 @@ class _TalkScreenState extends State<TalkScreen> {
         final responseBody = json.decode(utf8.decode(response.bodyBytes));
         setState(() {
           _responseText = responseBody['response'];
-          _tts.speak(_responseText); // AI 응답을 한글로 읽어줌
+          _tts.speak(_responseText);
           _isSpeaking = true;
         });
       } else {
@@ -118,8 +122,12 @@ class _TalkScreenState extends State<TalkScreen> {
   }
 
   Future<void> _generateStory() async {
+<<<<<<< Updated upstream
     final url =
         Uri.parse('http://127.0.0.1:8000/generate-story/'); // 이야기 생성 API
+=======
+    final url = Uri.parse('http://10.0.2.2:8000/generate-story/'); // 이야기 생성 API
+>>>>>>> Stashed changes
     final headers = {
       "accept": "application/json",
       "Content-Type": "application/json",
@@ -137,13 +145,17 @@ class _TalkScreenState extends State<TalkScreen> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
+<<<<<<< Updated upstream
             title: Text("이야기 생성 완료!"),
+=======
+            title: const Text("이야기 생성 완료!"),
+>>>>>>> Stashed changes
             content: Text(
                 "제목: ${responseBody['title']}\n\n${responseBody['story_text']}"),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text("확인"),
+                child: const Text("확인"),
               ),
             ],
           ),
@@ -270,7 +282,11 @@ class _TalkScreenState extends State<TalkScreen> {
                   height: 250,
                 ),
                 Positioned(
+<<<<<<< Updated upstream
                   top: 20,
+=======
+                  top: 50,
+>>>>>>> Stashed changes
                   left: 15,
                   child: SizedBox(
                     width: 240,

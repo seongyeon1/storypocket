@@ -59,7 +59,10 @@ class _TalkScreenState extends State<TalkScreen> {
 
     if (!_isListening) {
       setState(() => _showSuggestions = false); // 음성 인식 시작 시 추천 질문 숨기기
-      bool available = await _speech.initialize();
+      bool available = await _speech.initialize(
+        onStatus: (status) => print("STT Status: $status"),
+        onError: (error) => print("STT Error: $error"),
+      );
       if (available) {
         setState(() => _isListening = true);
         _speech.listen(
@@ -71,6 +74,8 @@ class _TalkScreenState extends State<TalkScreen> {
           localeId: "ko_KR",
         );
         _resetStopListeningTimer();
+      } else {
+        print("Speech recognition not available");
       }
     } else {
       _stopListening();
@@ -143,9 +148,10 @@ class _TalkScreenState extends State<TalkScreen> {
             child: ElevatedButton(
               onPressed: () {
                 setState(() {
-                  _responseText = randomSuggestions[index];
+                  _recognizedText = randomSuggestions[index];
                   _showSuggestions = false; // 추천 질문 클릭 시 추천 질문 숨기기
                 });
+                _sendMessage(randomSuggestions[index]); // 추천 질문 즉시 전송
               },
               child: Text(
                 randomSuggestions[index],
@@ -250,7 +256,7 @@ class _TalkScreenState extends State<TalkScreen> {
             ),
 
           // 마이크 버튼
-          mice_button(),
+          _buildMicrophoneButton(),
 
           // 추천 질문 초기 표시
           if (_showSuggestions) _buildSuggestedQuestions(),
@@ -277,7 +283,7 @@ class _TalkScreenState extends State<TalkScreen> {
     );
   }
 
-  Container mice_button() {
+  Container _buildMicrophoneButton() {
     return Container(
       decoration: const ShapeDecoration(
         shape: CircleBorder(

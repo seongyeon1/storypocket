@@ -1,7 +1,5 @@
-import 'dart:ffi';
 
 import 'package:flutter/material.dart';
-import 'package:my_project/screens/contants/elder_home_screen.dart';
 import 'package:my_project/screens/contants/elder_main_screen.dart';
 
 class IdPwScreen extends StatefulWidget {

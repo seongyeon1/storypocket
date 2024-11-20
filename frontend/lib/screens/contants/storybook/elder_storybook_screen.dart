@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:my_project/models/story.dart';
-import 'package:my_project/data/story_dummy_data.dart';
-import 'package:my_project/screens/common/widgets/story_tile.dart';
-import 'package:my_project/screens/contants/storybook/elder_storybook_defail_screen.dart';
+import 'package:flutter/services.dart';
+
+import 'package:my_project/models/story_book.dart';
+
+import 'package:my_project/screens/contants/storybook/elder_storybook_instruction_screen.dart';
+import 'package:my_project/screens/contants/storybook/widgets/story_book_tile.dart';
 
 class ElderStoybookScreen extends StatefulWidget {
   const ElderStoybookScreen({super.key});
@@ -13,28 +17,34 @@ class ElderStoybookScreen extends StatefulWidget {
 
 class _ElderStoybookScreenState extends State<ElderStoybookScreen> {
   //동화 데이터 리스트 저장 변수
-  List<Story> stories = [];
-  List<Story> originalStories = [];
+  List<StoryBook> storyBook = [];
+  List<StoryBook> originalStoryBooks = [];
 
   //버튼 텍스트 스타일
-  final _header_meau_style =
+  final _headerMeauStyle =
       const TextStyle(fontSize: 20, fontWeight: FontWeight.w500);
 
   @override
   void initState() {
     // TODO: implement initState
+    super.initState();
 
     // 데이터 가져오기
-    super.initState();
-    // stories = storyData
-    //     .map((data) => Story(
-    //           title: data['title'] as String,
-    //           author: data['author'] as String,
-    //           story: data['story'] as String,
-    //           views: data['views'] as int,
-    //         ))
-    //     .toList();
-    // originalStories = List.from(stories);
+    loadStoryBooks();
+  }
+
+  Future<void> loadStoryBooks() async {
+    String jsonString =
+        await rootBundle.loadString('assets/data/dummy_data.json');
+    List<dynamic> jsonData = jsonDecode(jsonString);
+
+    List<StoryBook> datalist =
+        jsonData.map((data) => StoryBook.fromJson(data)).toList();
+
+    setState(() {
+      storyBook = datalist;
+      originalStoryBooks = datalist;
+    });
   }
 
   @override
@@ -68,33 +78,36 @@ class _ElderStoybookScreenState extends State<ElderStoybookScreen> {
               children: [
                 const SizedBox(width: 10),
                 MenuButton(
-                  header_meau_style: _header_meau_style,
+                  headerMeauStyle: _headerMeauStyle,
                   title: "# 최신순 동화",
                   onPressed: () {
                     //최신순 정렬
                     setState(() {
                       // 원본 데이터로 다시 정렬
-                      stories = List.from(originalStories);
+                      storyBook = List.from(originalStoryBooks);
                     });
                   },
                 ),
                 const SizedBox(width: 20),
                 MenuButton(
-                  header_meau_style: _header_meau_style,
-                  title: "# 인기순 동화",
+                  headerMeauStyle: _headerMeauStyle,
+                  title: "# 추천순 동화",
                   onPressed: () {
                     //조회수 정렬
                     setState(() {
-                      stories.sort((a, b) => b.views.compareTo(a.views));
+                      storyBook.sort((a, b) =>
+                          b.recommendations.compareTo(a.recommendations));
                     });
                   },
                 ),
                 const SizedBox(width: 20),
                 MenuButton(
-                  header_meau_style: _header_meau_style,
-                  title: "# 급상승 동화",
+                  headerMeauStyle: _headerMeauStyle,
+                  title: "# 조회순 동화",
                   onPressed: () {
-                    stories.sort((a, b) => b.views.compareTo(a.views));
+                    setState(() {
+                      storyBook.sort((a, b) => b.views.compareTo(a.views));
+                    });
                   },
                 ),
                 const SizedBox(width: 40),
@@ -106,13 +119,14 @@ class _ElderStoybookScreenState extends State<ElderStoybookScreen> {
           //게시글//
           Expanded(
             child: ListView.separated(
-              itemCount: storyData.length,
+              itemCount: storyBook.length,
               itemBuilder: (context, index) {
-                final story = stories[index];
+                final story = storyBook[index];
                 final order = index;
                 //타일 위젯
-                Widget storyScreen = ElderStorybookDetailScreen(story: story);
-                return buildStoryTile(story, order, context, storyScreen);
+                Widget storyScreen =
+                    ElderStorybookInstructionScreen(storyBook: story);
+                return storyBookTile(story, order, context, storyScreen);
               },
               separatorBuilder: (BuildContext context, int index) {
                 return const Divider();
@@ -129,11 +143,11 @@ class MenuButton extends StatelessWidget {
   const MenuButton({
     super.key,
     required this.onPressed,
-    required TextStyle header_meau_style,
+    required TextStyle headerMeauStyle,
     required this.title,
-  }) : _header_meau_style = header_meau_style;
+  }) : _headerMeauStyle = headerMeauStyle;
 
-  final TextStyle _header_meau_style;
+  final TextStyle _headerMeauStyle;
   final String title;
   final VoidCallback onPressed;
 
@@ -141,7 +155,7 @@ class MenuButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        minimumSize: const Size(200, 40),
+        minimumSize: const Size(180, 40),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(15)),
         ),
@@ -149,7 +163,7 @@ class MenuButton extends StatelessWidget {
       onPressed: onPressed,
       child: Text(
         title,
-        style: _header_meau_style,
+        style: _headerMeauStyle,
       ),
     );
   }

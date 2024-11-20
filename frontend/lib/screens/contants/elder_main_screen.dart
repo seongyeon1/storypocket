@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:my_project/screens/contants/point/elder_point_screen.dart';
 import 'package:my_project/screens/contants/profile/elder_profile_sceen.dart';
 import 'elder_home_screen.dart';
-import 'talk/talk_screen.dart';
 
 class ElderMainScreen extends StatefulWidget {
   const ElderMainScreen({super.key});
@@ -51,14 +49,22 @@ class _ElderMainScreenState extends State<ElderMainScreen> {
 
       /* 네비게이션 메뉴 */
       bottomNavigationBar: BottomNavigationBar(
+        selectedFontSize: 20.0, // 선택된 항목 글씨 크기
+        unselectedFontSize: 20.0, // 선택되지 않은 항목 글씨 크기
         type: BottomNavigationBarType.fixed, //메뉴 4개 이상
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: Icon(
+              Icons.home,
+              size: 30,
+            ),
             label: '홈',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
+            icon: Icon(
+              Icons.account_circle,
+              size: 30,
+            ),
             label: '나의 발자취',
           ),
         ],

@@ -85,62 +85,35 @@ import base64
 async def chat(request: ChatRequest):
     try:
         response = multi_turn_chat(request.sex, request.message, request.session_id)
-        return {"response": response}
+        return {"response": response.replace('손자','').replace(':','').strip()}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
-# @app.post("/chat/")
-# async def chat(request: ChatRequest):
-#     try:
-#         # Generate chatbot response
-#         response_text = multi_turn_chat(request.sex, request.message, request.session_id)
-        
-#         # Initialize pyttsx3 TTS engine
-#         engine = pyttsx3.init()
-        
-#         # Set properties (optional)
-#         engine.setProperty('rate', 150)    # Speed percent (can go over 100)
-#         engine.setProperty('volume', 0.9)  # Volume 0-1
-        
-#         # Generate speech
-#         audio_buffer = io.BytesIO()
-#         engine.save_to_file(response_text, audio_buffer)
-#         engine.runAndWait()
-        
-#         # Get audio data
-#         audio_buffer.seek(0)
-#         audio_data = audio_buffer.read()
-        
-#         # Encode audio data to base64
-#         audio_base64 = base64.b64encode(audio_data).decode('utf-8')
-        
-#         return {
-#             "response": response_text,
-#             "audio": audio_base64
-#         }
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
-
-# # 대화 기록 조회
-# @app.get("/history/{session_id}")
-# async def get_chat_history(session_id: str):
-#     if session_id not in store:
-#         raise HTTPException(status_code=404, detail="Session ID not found")
+# 대화 기록 조회
+@app.get("/history/{session_id}")
+async def get_chat_history(session_id: str):
+    if session_id not in store:
+        raise HTTPException(status_code=404, detail="Session ID not found")
     
-#     chat_history = await store[session_id].aget_messages()
-#     history = [
-#         {
-#             "role": "user" if isinstance(msg, HumanMessage) else "ai",
-#             "content": msg.content
-#         }
-#         for msg in chat_history
-#     ]
-#     return {"session_id": session_id, "history": history}
+    chat_history = await store[session_id].aget_messages()
+    history = [
+        {
+            "role": "user" if isinstance(msg, HumanMessage) else "ai",
+            "content": msg.content
+        }
+        for msg in chat_history
+    ]
+    return {"session_id": session_id, "history": history}
 
+class GenerateStoryRequest(BaseModel):
+    session_id: str
+    user_id: str
 
 @app.post("/generate-story/")
-async def generate_story(session_id: str, user_id: str):
+async def generate_story(request: GenerateStoryRequest):
+    session_id = request.session_id
+    user_id = request.user_id
     # 기존 세션 확인 (스토어 내 세션 기반 처리)
     if session_id not in store:
         raise HTTPException(status_code=404, detail="Session ID not found")
@@ -269,8 +242,59 @@ async def generate_storycuts(session_id: str, user_id: str):
     return {"session_id": session_id, "cuts": storycuts_data["storybook"]}
 
 
+# @app.post("/generate-images/{session_id}")
+# async def generate_images_for_storycuts(session_id: str, user_id: str):
+#     """
+#     Generate images for storycuts and save paths to MongoDB.
+#     """
+#     # Fetch the story with cuts from MongoDB
+#     story = stories_collection.find_one({"_id": session_id, "user_id": user_id})
+#     if not story or "cuts" not in story:
+#         raise HTTPException(status_code=404, detail="Story or storycuts not found")
+
+#     # Prepare directory for storing images
+#     session_path = f"./static/{session_id}"
+#     os.makedirs(session_path, exist_ok=True)
+
+#     # Validate and process cuts
+#     updated_cuts = []
+#     for cut in story["cuts"]:
+#         if not isinstance(cut, dict) or "image_prompt" not in cut or "page" not in cut:
+#             raise HTTPException(status_code=400, detail=f"Invalid cut format: {cut}")
+
+#         prompt = cut["image_prompt"]
+#         try:
+#             print(prompt)
+#             img = generate_images(story=prompt)  # Generate image using the prompt
+#             if not isinstance(img, Image.Image):
+#                 raise ValueError("generate_images must return a PIL.Image object")
+
+#             # Save image to the file system
+#             img_filename = f"{cut['page']}.png"
+#             img_filepath = os.path.join(session_path, img_filename)
+#             img.save(img_filepath)
+
+#             # Update cut data with image path
+#             cut["image_path"] = img_filepath
+#             updated_cuts.append(cut)
+
+#         except Exception as e:
+#             raise HTTPException(status_code=500, detail=f"Failed to process cut: {cut}. Error: {str(e)}")
+
+#     # Update the MongoDB document with image paths
+#     stories_collection.update_one(
+#         {"_id": session_id},
+#         {"$set": {"cuts": updated_cuts}}
+#     )
+
+#     return {"session_id": session_id, "cuts": updated_cuts}
+
+from fastapi import HTTPException
+from PIL import Image
+import os
+
 @app.post("/generate-images/{session_id}")
-async def generate_images_for_storycuts(session_id: str, user_id: str):
+async def generate_images_for_storycuts(session_id: str, user_id: str, method: str = "stable_diffusion"):
     """
     Generate images for storycuts and save paths to MongoDB.
     """
@@ -283,73 +307,48 @@ async def generate_images_for_storycuts(session_id: str, user_id: str):
     session_path = f"./static/{session_id}"
     os.makedirs(session_path, exist_ok=True)
 
-    # Generate images for each cut
+    # Validate and process cuts
     updated_cuts = []
-    try:
-        for cut in story["cuts"]:
-            prompt = cut["image_prompt"]
-            img = generate_images(story=prompt)  # Generate image using the prompt
+    for cut in story["cuts"]:
+        if not isinstance(cut, dict) or "image_prompt" not in cut or "page" not in cut:
+            raise HTTPException(status_code=400, detail=f"Invalid cut format: {cut}")
 
-            # Save image to the file system
-            img_filename = f"{cut['page']}.png"
-            img_filepath = os.path.join(session_path, img_filename)
-            img.save(img_filepath)
+        prompt = cut["image_prompt"]
+        try:
+            # Generate image using the selected method
+            print(f"Generating image for prompt: {prompt}")
+            generated_images = generate_images(story=prompt, method=method)  # Pass method as argument
 
-            # Update cut data with image path
-            cut["image_path"] = img_filepath
+            if not isinstance(generated_images, list) or not generated_images:
+                raise ValueError("generate_images must return a list of image objects")
+
+            # Process the first generated image (if multiple are generated)
+            img_data = generated_images[0]  # Assuming only one image is returned
+            if "image" in img_data and isinstance(img_data["image"], Image.Image):
+                img = img_data["image"]
+                img_filename = f"{cut['page']}.png"
+                img_filepath = os.path.join(session_path, img_filename)
+                img.save(img_filepath)
+                cut["image_path"] = img_filepath
+            elif "image_url" in img_data and isinstance(img_data["image_url"], str):
+                cut["image_path"] = img_data["image_url"]
+            else:
+                raise ValueError("Invalid image data structure returned from generate_images")
+
             updated_cuts.append(cut)
 
-        # Update the MongoDB document with image paths
+        except Exception as e:
+            print(f"Error generating image for prompt '{prompt}': {e}")
+            cut["image_path"] = None  # Optional: Mark as failed
+            updated_cuts.append(cut)  # Ensure all cuts are added, even failed ones
+
+    # Update the MongoDB document with image paths
+    try:
         stories_collection.update_one(
             {"_id": session_id},
             {"$set": {"cuts": updated_cuts}}
         )
-
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Image generation failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to update database: {e}")
 
     return {"session_id": session_id, "cuts": updated_cuts}
-
-# import os
-# from bson.objectid import ObjectId
-# from io import BytesIO
-# from PIL import Image
-
-# # 이미지 저장 경로
-# IMAGE_STORAGE_PATH = "../static/"
-
-# @app.post("/generate-images/{session_id}")
-# async def generate_images(session_id: str, user_id: str):
-#     # MongoDB에서 이야기 가져오기
-#     # **위에 storycut 만든 것 가져와서 사용하는 것으로 수정**
-#     story = stories_collection.find_one({"_id": session_id, "user_id": user_id})
-#     if not story:
-#         raise HTTPException(status_code=404, detail="Story not found or unauthorized access")
-
-#     # 이미지 프롬프트 생성 및 이미지 생성
-#     try:
-#         descriptions = story_to_img_chain.invoke({"story": story["story_text"]}).split('\n\n')
-#         session_path = os.path.join(IMAGE_STORAGE_PATH, session_id)
-#         os.makedirs(session_path, exist_ok=True)  # 이미지 저장 경로 생성
-
-#         cuts = []  # 페이지별 데이터 저장
-#         for idx, description in enumerate(descriptions):
-#             prompt = description_to_prompt_chain.invoke({'description': description})
-#             img = generate_images(story=prompt)  # PIL 이미지 객체
-
-#             # 이미지 저장
-#             img_filename = f"{idx+1}.png"
-#             img_filepath = os.path.join(session_path, img_filename)
-#             img.save(img_filepath)
-
-
-#         # MongoDB에 업데이트 (cuts 필드에 이미지 데이터 추가)
-#         stories_collection.update_one(
-#             {"_id": session_id},
-#             {"$set": {"cuts": cuts}}
-#         )
-
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=f"Image generation failed: {str(e)}")
-
-#     return {"session_id": session_id, "cuts": cuts}

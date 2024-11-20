@@ -25,10 +25,10 @@ class _TalkScreenState extends State<TalkScreen> {
   String _recognizedText = ''; // 실시간 사용자 말풍선 텍스트
   String _responseText = '안녕하세요! 오늘은 어떤 이야기를 할까요?'; // 초기 AI 응답 텍스트
   String _sessionId = 'session_id1'; // 세션 ID
-  String _userId = 'user_id1'; // 사용자 ID
+  String _userId = 'user123'; // 사용자 ID
   String sex = '할아버지'; // 성별 정보 (예: 할아버지, 할머니)
   Timer? _stopListeningTimer;
-  final int _noInputTimeout = 5;
+  final int _noInputTimeout = 15;
 
   @override
   void initState() {
@@ -118,7 +118,8 @@ class _TalkScreenState extends State<TalkScreen> {
   }
 
   Future<void> _generateStory() async {
-    final url = Uri.parse('http://127.0.0.1:8000/generate-story/'); // 이야기 생성 API
+    final url =
+        Uri.parse('http://127.0.0.1:8000/generate-story/'); // 이야기 생성 API
     final headers = {
       "accept": "application/json",
       "Content-Type": "application/json",
@@ -137,7 +138,8 @@ class _TalkScreenState extends State<TalkScreen> {
           context: context,
           builder: (context) => AlertDialog(
             title: Text("이야기 생성 완료!"),
-            content: Text("제목: ${responseBody['title']}\n\n${responseBody['story_text']}"),
+            content: Text(
+                "제목: ${responseBody['title']}\n\n${responseBody['story_text']}"),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
@@ -161,15 +163,15 @@ class _TalkScreenState extends State<TalkScreen> {
   // 추천 질문 리스트 생성
   List<String> _getRandomSuggestions() {
     List<String> suggestions = [
-      '오늘 식사는 어떠셨어요?',
-      '요즘 가장 행복한 순간은 언제였나요?',
-      '어제는 뭐하셨나요?',
-      '오늘 기분은 어떠세요?',
+      // '오늘 식사는 어떠셨어요?',
+      // '요즘 가장 행복한 순간은 언제였나요?',
+      // '어제는 뭐하셨나요?',
+      // '오늘 기분은 어떠세요?',
       '추억의 음식이 있나요?',
       '어렸을 때 자주 놀던 놀이는 무엇인가요?',
       '어릴 적 가족과의 추억은?',
-      '가장 좋아하는 노래는 뭐였나요?',
-      '옛날에 자주 가셨던 곳은?',
+      // '가장 좋아하는 노래는 뭐였나요?',
+      // '옛날에 자주 가셨던 곳은?',
     ];
     suggestions.shuffle();
     return suggestions.take(3).toList();
@@ -190,7 +192,7 @@ class _TalkScreenState extends State<TalkScreen> {
             child: ElevatedButton(
               onPressed: () {
                 setState(() {
-                  _recognizedText = randomSuggestions[index];
+                  // _recognizedText = randomSuggestions[index];
                   _showSuggestions = false; // 추천 질문 클릭 시 추천 질문 숨기기
                 });
                 _sendMessage(randomSuggestions[index]); // 추천 질문 즉시 전송
@@ -251,76 +253,78 @@ class _TalkScreenState extends State<TalkScreen> {
       appBar: AppBar(
         title: const Text("AI 손녀"),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          const Text(
-            "마이크 버튼을 클릭하고 대화를 시작해 보세요!",
-            style: TextStyle(fontSize: 17),
-          ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            const Text(
+              "마이크 버튼을 클릭하고 대화를 시작해 보세요!",
+              style: TextStyle(fontSize: 17),
+            ),
 
-          // AI 응답 말풍선
-          Stack(
-            children: [
-              Image.asset(
-                'assets/image/speech_balloon.png',
-                height: 250,
-              ),
-              Positioned(
-                top: 50,
-                left: 15,
-                child: SizedBox(
-                  width: 240,
-                  child: Text(
-                    _responseText, // AI 응답 텍스트
-                    textAlign: TextAlign.left,
-                    style: speechBalloonText,
-                  ),
+            // AI 응답 말풍선
+            Stack(
+              children: [
+                Image.asset(
+                  'assets/image/speech_balloon.png',
+                  height: 250,
                 ),
-              )
-            ],
-          ),
-
-          // 소녀 이미지
-          Image.asset(
-            'assets/image/girl.png',
-            height: 300,
-          ),
-
-          // 사용자 말풍선 (하단)
-          if (_recognizedText.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                "사용자: $_recognizedText", // 사용자 실시간 텍스트
-                style: speechBalloonText,
-              ),
+                Positioned(
+                  top: 20,
+                  left: 15,
+                  child: SizedBox(
+                    width: 240,
+                    child: Text(
+                      _responseText, // AI 응답 텍스트
+                      textAlign: TextAlign.left,
+                      style: speechBalloonText,
+                    ),
+                  ),
+                )
+              ],
             ),
 
-          // 마이크 버튼
-          _buildMicrophoneButton(),
+            // 소녀 이미지
+            Image.asset(
+              'assets/image/girl.png',
+              height: 300,
+            ),
 
-          // 추천 질문 초기 표시
-          if (_showSuggestions) _buildSuggestedQuestions(),
+            // 사용자 말풍선 (하단)
+            if (_recognizedText.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  "사용자: $_recognizedText", // 사용자 실시간 텍스트
+                  style: speechBalloonText,
+                ),
+              ),
 
-          // 이야기 생성 버튼
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              fixedSize: const Size.fromWidth(199),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+            // 마이크 버튼
+            _buildMicrophoneButton(),
+
+            // 추천 질문 초기 표시
+            if (_showSuggestions) _buildSuggestedQuestions(),
+
+            // 이야기 생성 버튼
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                fixedSize: const Size.fromWidth(199),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              onPressed: _generateStory,
+              child: const Text(
+                "이야기 생성",
+                style: TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
-            onPressed: _generateStory,
-            child: const Text(
-              "이야기 생성",
-              style: TextStyle(
-                fontSize: 25,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

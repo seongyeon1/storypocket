@@ -78,7 +78,7 @@ def generate_images_stable_diffusion(story, width=512, height=512, steps=50):
         prompt = prefix[1]+ data['image_prompt']
         answers = stability_api.generate(
             prompt=prompt,
-            seed=992446758,
+            seed=82,
             steps=steps,
             cfg_scale=8.0,
             width=width,
